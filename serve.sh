@@ -10,6 +10,13 @@ then
     exit 1
 fi;
 
+# If we don't have a EMAIL_ADDRESS set, complain and exit
+if [ -z "$EMAIL_ADDRESS" ];
+then
+    echo "Error: EMAIL_ADDRESS variable not set."
+    exit 1
+fi;
+
 # If we don't have a LINODE_CLI_TOKEN set, complain and exit
 if [ -z "$LINODE_CLI_TOKEN" ];
 then
@@ -35,7 +42,7 @@ fi;
 
 export NODEBALANCER_LABEL=`linode-cli nodebalancers view $NODEBALANCER_ID --text --no-headers --format label`
 
-if [-z "$NODEBALANCER_LABEL" ];
+if [ -z "$NODEBALANCER_LABEL" ];
 then
     echo Bad NODEBALANCER_ID $NODEBALANCER_ID
     exit 1
@@ -101,7 +108,8 @@ fi;
 nginx
 
 # Run the cert for the given domain using nginx
-$ACME --config-home /data \
+$ACME -m $EMAIL_ADDRESS \
+      --config-home /data \
       --issue -d $DOMAIN_NAME \
       -w /usr/share/nginx/html \
       --reloadcmd "/install_cert.sh" \
